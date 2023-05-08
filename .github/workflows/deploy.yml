@@ -38,7 +38,7 @@ jobs:
 
     - name: Build and Deploy
 
-      uses: actions-marketplace-validations/y4code_hexo-deploy-action@master
+      uses: myblog_source/hexo-deploy-action@master
       env:
         PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         PUBLISH_REPOSITORY: ddding-z/ddding-z.github.io 
