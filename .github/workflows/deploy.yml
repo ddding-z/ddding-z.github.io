@@ -1,47 +1,81 @@
-name: GitHub Actions Build and Deploy
+# name: GitHub Actions Build and Deploy
+# on:
+#   push:
+#     branches:
+
+#       - master
+
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+
+#     - name: 1. git checkout...
+
+#       uses: actions/checkout@v1
+
+#     - name: 2. setup nodejs...
+
+#       uses: actions/setup-node@v1
+
+#     - name: 3. install hexo...
+
+#       run: |
+#         npm install hexo-cli -g
+#         npm i -S hexo-prism-plugin -g
+#         npm install hexo-generator-search --save -g
+#         npm i hexo-permalink-pinyin  -g
+#         npm i --save hexo-wordcount -g
+#         npm install hexo-filter-github-emojis  -g
+#         npm install hexo-generator-feed  -g
+#         npm install
+
+#     - name: 4. hexo generate public files...
+
+#       run: |
+#         hexo clean
+#         hexo g
+
+#     - name: Build and Deploy
+
+#       uses: y4code/hexo-deploy-action@master
+#       env:
+#         PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+#         PUBLISH_REPOSITORY: ddding-z/ddding-z.github.io 
+#         BRANCH: master
+#         PUBLISH_DIR: ./public
+
+name: Pages
+
 on:
   push:
     branches:
-
-      - master
+      - main # default branch
 
 jobs:
-  build-and-deploy:
+  pages:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-
-    - name: 1. git checkout...
-
-      uses: actions/checkout@v1
-
-    - name: 2. setup nodejs...
-
-      uses: actions/setup-node@v1
-
-    - name: 3. install hexo...
-
-      run: |
-        npm install hexo-cli -g
-        npm i -S hexo-prism-plugin -g
-        npm install hexo-generator-search --save -g
-        npm i hexo-permalink-pinyin  -g
-        npm i --save hexo-wordcount -g
-        npm install hexo-filter-github-emojis  -g
-        npm install hexo-generator-feed  -g
-        npm install
-
-    - name: 4. hexo generate public files...
-
-      run: |
-        hexo clean
-        hexo g
-
-    - name: Build and Deploy
-
-      uses: y4code/hexo-deploy-action@master
-      env:
-        PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        PUBLISH_REPOSITORY: ddding-z/ddding-z.github.io 
-        BRANCH: master
-        PUBLISH_DIR: ./public
-
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Cache NPM dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-npm-cache
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache
+      - name: Install Dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.ACCESS_TOKEN }}
+          publish_dir: ./public
